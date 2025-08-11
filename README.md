@@ -7,6 +7,7 @@
 ## 数据结构
 
 - `Data/Deque`: 双端队列 (Deque)
+- `Data/Hash`: 哈希表 (Hash Table)
 - `Data/Heap/BinaryHeap`: 二叉堆 (Binary Heap)
 - `Data/Heap/PairingHeap`: 配对堆 (Pairing Heap)
 
