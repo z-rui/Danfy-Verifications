@@ -4,6 +4,10 @@
 
 本仓库使用 Dafny 语言实现了一些常见的数据结构和排序算法。
 
+## 数据结构
+
+- `Data/Heap/BinaryHeap`: 二叉堆 (Binary Heap)
+
 ## 排序算法
 
 - `Algo/Sort/MergeSort`: 归并排序 (Merge Sort)
