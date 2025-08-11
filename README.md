@@ -8,6 +8,7 @@
 
 - `Data/Deque`: 双端队列 (Deque)
 - `Data/Heap/BinaryHeap`: 二叉堆 (Binary Heap)
+- `Data/Heap/PairingHeap`: 配对堆 (Pairing Heap)
 
 ## 排序算法
 
