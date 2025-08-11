@@ -8,3 +8,4 @@
 
 - `Algo/Sort/MergeSort`: 归并排序 (Merge Sort)
 - `Algo/Sort/NaiveSort`: 朴素排序 (Naive Sort)
+- `Algo/Sort/QuickSort`: 快速排序 (Quick Sort)
