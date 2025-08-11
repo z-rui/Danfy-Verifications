@@ -85,6 +85,33 @@ module UnionFind
     exists d :: PathTerminatesAfter(s, i, d)
   }
 
+  lemma AcyclicProperty(s: seq<nat>, i: nat, d: nat)
+    requires IndicesInRange(s)
+    requires i < |s|
+    requires PathTerminates(s, i)
+    requires !PathTerminatesAfter(s, i, d)
+    ensures forall d' :: d' > d ==> NthParent(s, i, d') != NthParent(s, i, d)
+  {
+    forall d' | d' > d
+      ensures NthParent(s, i, d') != NthParent(s, i, d)
+    {
+      if NthParent(s, i, d') == NthParent(s, i, d)
+      {
+        forall k
+          ensures !PathTerminatesAfter(s, i, k)
+        {
+          AncestorsTrappedInCycle(s, i, d', d, k);
+          var k': nat :| k' < d' && NthParent(s, i, k') == NthParent(s, i, k);
+          for k := d' downto k'
+            invariant !PathTerminatesAfter(s, i, k)
+          {
+          }
+        }
+        assert {:contradiction} PathTerminates(s, i);
+      }
+    }
+  }
+
   // It's surprisingly difficult to precisely construct the depth of a node.
   // This is the minimal d that satisfies PathTerminatesAfter(s, i, d),
   // but we also need to prove that d < |s|.
@@ -107,15 +134,8 @@ module UnionFind
     {
       if j in visited
       {
-        // Visit chain forms a cycle, absurd.
-        var d' := visited[j];
-        forall k ensures !PathTerminatesAfter(s, i, k)
-        {
-          AncestorsTrappedInCycle(s, i, currDepth, d', k);
-          var k': nat :| k' < currDepth && NthParent(s, i, k') == NthParent(s, i, k);
-          assert !PathTerminatesAfter(s, i, k');
-        }
-        assert {:contradiction} PathTerminates(s, i);
+        // Violates acyclic property.
+        AcyclicProperty(s, i, visited[j]);
       }
     }
     assert currDepth < |s| by
@@ -283,13 +303,13 @@ module UnionFind
     ensures Valid(s[..]) && ToMap(s[..]) == old(ToMap(s[..]))
     ensures r == ToMap(s[..])[i]
   {
-    if s[i] == i {
-      return i;
-    }
+    ghost var s' := s[..];
+
+    // Find root.
     var curr := i;
     while s[curr] != curr
       invariant 0 <= curr < s.Length
-      invariant Valid(s[..]) && ToMap(s[..]) == old(ToMap(s[..]))
+      invariant s[..] == s'
       invariant RootOf(s[..], curr) == RootOf(s[..], i)
       decreases Depth(s[..], curr)
     {
@@ -297,9 +317,27 @@ module UnionFind
       RootRecursion(s[..], curr);
       curr := s[curr];
     }
-    UpdateCorrect(s[..], i, curr);
-    s[i] := curr;
-    return curr;
+    assert curr == ToMap(s')[i];
+    r := curr;
+
+    // Path compression
+    ghost var d := 0;
+    curr := i;
+    while s[curr] != curr
+      invariant 0 <= d <= Depth(s', i)
+      invariant curr == NthParent(s', i, d)
+      invariant RootOf(s', curr) == r
+      invariant forall d' :: d' >= d ==> var j := NthParent(s', i, d'); s[j] == s'[j]
+      invariant Valid(s[..]) && ToMap(s[..]) == ToMap(s')
+      decreases Depth(s', i) - d
+    {
+      AcyclicProperty(s', i, d);
+      RootRecursion(s', curr);
+      assert RootOf(s[..], curr) == ToMap(s')[curr] == r;
+      UpdateCorrect(s[..], curr, r);
+      curr, s[curr] := s[curr], r;
+      d := d + 1;
+    }
   }
 
   method Union(s: array<nat>, i: nat, j: nat)
