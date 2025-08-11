@@ -6,6 +6,7 @@
 
 ## 数据结构
 
+- `Data/Deque`: 双端队列 (Deque)
 - `Data/Heap/BinaryHeap`: 二叉堆 (Binary Heap)
 
 ## 排序算法
