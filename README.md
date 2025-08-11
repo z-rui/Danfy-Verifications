@@ -6,4 +6,5 @@
 
 ## 排序算法
 
+- `Algo/Sort/MergeSort`: 归并排序 (Merge Sort)
 - `Algo/Sort/NaiveSort`: 朴素排序 (Naive Sort)
